@@ -1,4 +1,4 @@
-// middleware functions
+// middleware functions (have access to req, res cycle)
 
 export const getBootcamps = (req, res, next) => {
 	res.status(200).json({success: true, msg: "receive bootcamps"});
