@@ -1,24 +1,16 @@
 import { Router } from 'express';
 const router = Router();
 
-router.get('/', (req, res) => {
-	res.status(200).json({success: true, msg: "receive bootcamps"});
-});
+import {
+	getBootcamps,
+	getBootcamp,
+	createBootcamp,
+	updateBootcamp,
+	deleteBootcamp
+} from '../controllers/bootcamps';
 
-router.post('/', (req, res) => {
-	res.status(200).json({success: true, msg: `create new bootcamp`});
-});
-
-router.get('/:id', (req, res) => {
-	res.status(200).json({success: true, msg: `show bootcamp ${req.params.id}`});
-});
-
-router.put('/:id', (req, res) => {
-	res.status(200).json({success: true, msg: `update bootcamp ${req.params.id}`});
-});
-
-router.delete('/:id', (req, res) => {
-	res.status(200).json({success: true, msg: `delete bootcamp ${req.params.id}`});
-});
+// add middleware functions for appropriate routes
+router.route('/').get(getBootcamps).post(createBootcamp);
+router.route('/:id').get(getBootcamp).put(updateBootcamp).delete(deleteBootcamp);
 
 export default router;
