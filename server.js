@@ -1,7 +1,7 @@
-import express from 'express';
+import express, { json } from 'express';
 import dotenv from 'dotenv';
 import { bootcamps } from './routes/';
-import { logger } from './middleware/logger';
+import { logger, errorHandler } from './middleware/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
 
@@ -12,6 +12,9 @@ connectDB();
 
 const app = express();
 
+// Body parser
+app.use(json());
+
 const { PORT=5000, NODE_ENV } = process.env || {};
 
 if (NODE_ENV === 'development') {
@@ -20,8 +23,9 @@ if (NODE_ENV === 'development') {
 
 app.use('/api/v1/bootcamps', bootcamps);
 
-const server = app.listen(PORT, console.log(`Server running in ${NODE_ENV} on port ${PORT}`.blue.bold));
+app.use(errorHandler);
 
+const server = app.listen(PORT, console.log(`Server running in ${NODE_ENV} on port ${PORT}`.blue.bold));
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
