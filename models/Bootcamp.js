@@ -1,5 +1,6 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 import slugify from 'slugify';
+import geocoder from '../utils/geocoder';
 
 const BootcampSchema = new Schema({
     name: {
@@ -101,6 +102,39 @@ const BootcampSchema = new Schema({
 
 BootcampSchema.pre('save', function (next) {
 	this.slug = slugify(this.name, { lower: true });
+	next && next();
+});
+
+// Geocode and create location field
+BootcampSchema.pre('save', async function (next) {
+	const location = await geocoder.geocode(this.address);
+	const [locationObj={}] = location;
+	const {
+		longitude,
+		latitude,
+		formattedAddress,
+		streetName: street,
+		city,
+		stateCode: state,
+		zipcode,
+		countryCode: country
+	} = locationObj;
+
+	// Geojson obj with type as a point
+	this.location = {
+		type: 'Point',
+		coordinates: [longitude, latitude],
+		formattedAddress,
+		street,
+		city,
+		state,
+		zipcode,
+		country
+	};
+
+	// because we have formatted address, we do not need to save the client input address
+	this.address = undefined;
+
 	next && next();
 });
 
