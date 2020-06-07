@@ -9,3 +9,7 @@ export const getParams = (request = {}) => {
 export const getBody = (request = {}) => {
 	return request.body || {};
 }
+
+export const getQuery = (request = {}) => {
+	return request.query || {};
+}

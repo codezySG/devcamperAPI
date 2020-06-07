@@ -2,7 +2,7 @@
 import Bootcamp from '../models/Bootcamp';
 
 // Selectors
-import { getId, getBody, getParams } from '../selectors/request';
+import { getId, getBody, getParams, getQuery } from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
@@ -15,7 +15,10 @@ import geocoder from '../utils/geocoder';
 const EARTH_RADIUS = 3963;
 
 export const getBootcamps = asyncHandler(async (req, res, next) => {
-	const bootcamps = await Bootcamp.find();
+	const queryStr = JSON.stringify(getQuery(req)).replace(/\b(gt|gte|lt|lte|in)/g, match => `$${match}`);
+	Bootcamp.find(JSON.parse(queryStr));
+
+	const bootcamps = await Bootcamp.find(JSON.parse(queryStr));
 	res.status(200).json({success: true, count: bootcamps.length, data: bootcamps});
 });
 
