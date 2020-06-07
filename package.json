@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=production babel-node server",
-    "dev": "nodemon --exec babel-node server"
+    "dev": "nodemon --exec babel-node server",
+    "insert": "node babel-node seeder"
   },
   "author": "Stefana Gloginic",
   "license": "MIT",
@@ -19,7 +20,9 @@
   "dependencies": {
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "mongoose": "^5.9.16",
     "node-geocoder": "^3.27.0",
     "slugify": "^1.4.0"
