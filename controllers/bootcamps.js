@@ -27,7 +27,8 @@ export const getBootcamps = asyncHandler(async (req, res, next) => {
 
 	// create query as string and use regex to match and replace gt/gte/lt/lte/in with $ in front
 	const queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)/g, match => `$${match}`);
-	let query = Bootcamp.find(JSON.parse(queryStr));
+	// populate courses is used to enable reverse querying...bootcamp res will then have array of courses
+	let query = Bootcamp.find(JSON.parse(queryStr)).populate('courses'); // can pass in obj to limit fields just like done in courses model for the bootcamp link
 
 	// handle any appendable queries
 	const {

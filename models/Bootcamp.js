@@ -98,6 +98,9 @@ const BootcampSchema = new Schema({
       type: Date,
       default: Date.now
     }
+}, {
+  toJSON: { virtuals: true }, // this will enable us to have an array of courses appear in our bootcamp queries (reverse query)
+  toObject: { virtuals: true }
 });
 
 BootcampSchema.pre('save', function (next) {
@@ -137,5 +140,13 @@ BootcampSchema.pre('save', async function (next) {
 
 	next && next();
 });
+
+// reverse populate with virtual
+BootcampSchema.virtual('courses', {
+  ref: 'Course',
+  localField: '_id',
+  foreignField: 'bootcamp', // the mapping in the schema specified to link a course with a bootcamp (in models/Course.js)
+  justOne: false // we want an array of all courses for each bootcamp
+})
 
 export default model('Bootcamp', BootcampSchema);

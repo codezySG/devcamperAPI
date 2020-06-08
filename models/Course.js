@@ -33,7 +33,7 @@ const CourseSchema = new Schema({
 	},
 	bootcamp: {
 		type: Schema.ObjectId,
-		ref: 'Bootcamp',
+		ref: 'Bootcamp', // model name that is then exported
 		required: true
 	}
 });
