@@ -115,11 +115,20 @@ export const updateBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteBootcamp = asyncHandler(async (req, res, next) => {
-	const bootcamp = await Bootcamp.findByIdAndDelete(getId(req));
+	/*
+		previously used findByIdAndDelete..but with the newly added middleware
+		to delete courses affiliated with the bootcamp to delete..needed to
+		change to a function that will trigger the pre delete middleware
+		changed to find first, then call remove
+	*/
+	const bootcamp = await Bootcamp.findById(getId(req));
 
 	if (!bootcamp) {
 		return next(new ErrorResponse(`Bootcamp not found with id of ${getId(req)}`, 404));
 	}
+
+	// triggers pre middleware to ensure proper recursive deletion
+	bootcamp.remove();
 
 	res.status(200).json({success: true, data: null});
 });
