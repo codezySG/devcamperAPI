@@ -13,12 +13,34 @@ import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/geocoder';
 
 const EARTH_RADIUS = 3963;
+const fieldExclusionList = ['select', 'sort'];
 
 export const getBootcamps = asyncHandler(async (req, res, next) => {
-	const queryStr = JSON.stringify(getQuery(req)).replace(/\b(gt|gte|lt|lte|in)/g, match => `$${match}`);
-	Bootcamp.find(JSON.parse(queryStr));
+	const reqQuery = { ...getQuery(req) };
+	fieldExclusionList.forEach((param) => {
+		delete reqQuery[param];
+	});
 
-	const bootcamps = await Bootcamp.find(JSON.parse(queryStr));
+	// create query as string and use regex to match and replace gt/gte/lt/lte/in with $ in front
+	const queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)/g, match => `$${match}`);
+	let query = Bootcamp.find(JSON.parse(queryStr));
+	// if select field was in the og query
+	const selectQuery = getQuery(req).select;
+	if (selectQuery) {
+		const fieldsArr = selectQuery.split(',').join(' ');
+		query = query.select(fieldsArr);
+	}
+
+	// Sort
+	const sortQuery = reqQuery.sort;
+	if (sortQuery) {
+		const sortBy = sortQuery.split(',').join(' ');
+		query = query.sort(sortBy);
+	} else { // default sorting by date
+		query = query.sort('-createdAt');
+	}
+
+	const bootcamps = await query;
 	res.status(200).json({success: true, count: bootcamps.length, data: bootcamps});
 });
 
