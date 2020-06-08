@@ -13,7 +13,11 @@ import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/geocoder';
 
 const EARTH_RADIUS = 3963;
-const fieldExclusionList = ['select', 'sort'];
+const DEFAULT_PAGE_NUM = 1;
+const DEFAULT_LIMIT_NUM = 1;
+
+// queries appended that are supported but should not be considered as fields in schema
+const fieldExclusionList = ['select', 'sort', 'limit', 'page'];
 
 export const getBootcamps = asyncHandler(async (req, res, next) => {
 	const reqQuery = { ...getQuery(req) };
@@ -24,15 +28,22 @@ export const getBootcamps = asyncHandler(async (req, res, next) => {
 	// create query as string and use regex to match and replace gt/gte/lt/lte/in with $ in front
 	const queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)/g, match => `$${match}`);
 	let query = Bootcamp.find(JSON.parse(queryStr));
+
+	// handle any appendable queries
+	const {
+		select: selectQuery,
+		sort: sortQuery,
+		page: pageQuery,
+		limit: limitQuery
+	} = getQuery(req);
+
 	// if select field was in the og query
-	const selectQuery = getQuery(req).select;
 	if (selectQuery) {
 		const fieldsArr = selectQuery.split(',').join(' ');
 		query = query.select(fieldsArr);
 	}
 
-	// Sort
-	const sortQuery = reqQuery.sort;
+	// sort
 	if (sortQuery) {
 		const sortBy = sortQuery.split(',').join(' ');
 		query = query.sort(sortBy);
@@ -40,8 +51,38 @@ export const getBootcamps = asyncHandler(async (req, res, next) => {
 		query = query.sort('-createdAt');
 	}
 
+	// pagination
+	const page = parseInt(pageQuery, 10) || DEFAULT_PAGE_NUM;
+	const limit = parseInt(limitQuery, 10) || DEFAULT_LIMIT_NUM;
+	const startIndex = (page - 1) * limit;
+	const endIndex = page * limit;
+
+	const total = await Bootcamp.countDocuments();
+
+	query = query.skip(startIndex).limit(limit);
+
 	const bootcamps = await query;
-	res.status(200).json({success: true, count: bootcamps.length, data: bootcamps});
+	const pagination = {
+		next: (
+			endIndex < total ? {
+				page: page + 1,
+				limit
+			} : null
+		),
+		prev: (
+			startIndex > 0 ? {
+				page: page - 1,
+				limit
+			} : null
+		)
+	};
+
+	res.status(200).json({
+		success: true,
+		count: bootcamps.length,
+		pagination,
+		data: bootcamps
+	});
 });
 
 export const getBootcamp = asyncHandler(async (req, res, next) => {
