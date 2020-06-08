@@ -3,6 +3,7 @@ import { connect } from 'mongoose';
 import colors from 'colors';
 import dotenv from 'dotenv';
 import Bootcamp from './models/Bootcamp.js';
+import Course from './models/Course.js';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -19,9 +20,14 @@ const bootcamps = JSON.parse(
 	fs.readFileSync(`${__dirname}/devcamper_project_resources/_data/bootcamps.json`, 'utf-8')
 );
 
+const courses = JSON.parse(
+	fs.readFileSync(`${__dirname}/devcamper_project_resources/_data/courses.json`, 'utf-8')
+);
+// conosle.log(courses);
 const importData = async () => {
 	try {
 		await Bootcamp.create(bootcamps);
+		await Course.create(courses);
 		console.log('Data Imported...'.green.inverse);
 		process.exit();
 	} catch (err) {
@@ -32,6 +38,7 @@ const importData = async () => {
 const deleteData = async () => {
 	try {
 		await Bootcamp.deleteMany();
+		await Course.deleteMany();
 		console.log('Data Deleted...'.red.inverse);
 		process.exit();
 	} catch (err) {

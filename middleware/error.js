@@ -5,10 +5,10 @@ export const errorHandler = (err, req, res, next) => {
 	console.log(err.stack.red);
 	let error = { ...err };
 	error.message = err.message;
-	const { name, value, code } = error;
+	const { name, value, code, kind } = error;
 
 	// mongoose bad obj id
-	if (name === 'CastError') {
+	if (name === 'CastError' || kind === 'ObjectId') {
 		const message = `Resource not found with id of ${value}`;
 		error = new ErrorResponse(message, 404);
 	} else if (code === 11000) { // mongoose duplicate key

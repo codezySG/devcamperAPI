@@ -1,6 +1,6 @@
 import express, { json } from 'express';
 import dotenv from 'dotenv';
-import { bootcamps } from './routes/';
+import { bootcamps, courses } from './routes/';
 import { logger, errorHandler } from './middleware/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
@@ -22,6 +22,7 @@ if (NODE_ENV === 'development') {
 }
 
 app.use('/api/v1/bootcamps', bootcamps);
+app.use('/api/v1/courses', courses);
 
 app.use(errorHandler);
 
