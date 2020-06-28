@@ -40,8 +40,6 @@ const CourseSchema = new Schema({
 
 // Static method to get average of course tuitions
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
-	console.log('Calculating avg cost'.blue);
-
 	// brackets indicate pipeline...in bracket are the steps to take
 	const averegedCost = await this.aggregate([
 		{

@@ -7,7 +7,8 @@ import {
 	createBootcamp,
 	updateBootcamp,
 	deleteBootcamp,
-	getBootcampsInRadius
+	getBootcampsInRadius,
+	uploadBootcampPhoto
 } from '../controllers/bootcamps';
 
 // include other resource routers
@@ -20,5 +21,6 @@ router.use('/:bootcampId/courses', coursesRouter);
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
 router.route('/').get(getBootcamps).post(createBootcamp);
 router.route('/:id').get(getBootcamp).put(updateBootcamp).delete(deleteBootcamp);
+router.route('/:id/photo').put(uploadBootcampPhoto);
 
 export default router;

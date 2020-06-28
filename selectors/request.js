@@ -13,3 +13,11 @@ export const getBody = (request = {}) => {
 export const getQuery = (request = {}) => {
 	return request.query || {};
 }
+
+export const getFiles = (request = {}) => {
+	return request.files || {};
+}
+
+export const getFile = (request = {}) => {
+	return getFiles(request).file;
+}

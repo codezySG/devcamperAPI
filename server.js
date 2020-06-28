@@ -1,9 +1,11 @@
+import { join } from 'path';
 import express, { json } from 'express';
 import dotenv from 'dotenv';
 import { bootcamps, courses } from './routes/';
 import { logger, errorHandler } from './middleware/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
+import fileUpload from 'express-fileupload';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -21,6 +23,12 @@ if (NODE_ENV === 'development') {
 	app.use(logger);
 }
 
+app.use(fileUpload());
+
+// set static folder
+app.use(express.static(join(__dirname, 'public')));
+
+// routers
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 
