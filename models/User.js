@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 
 import { genSalt, hash } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
 
 const UserSchema = new Schema({
 	name: {
@@ -42,5 +43,14 @@ UserSchema.pre('save', async function (next) {
 
 	next && next();
 });
+
+// Sign JWT and return
+// called on actual user so have access to id (not static)
+UserSchema.methods.getSignedJwtToken = function () {
+	const { JWT_SECRET, JWT_EXPIRE } = process.env || {}; 
+	return sign({ id: this._id }, JWT_SECRET, {
+		expiresIn: JWT_EXPIRE
+	});
+};
 
 export default model('User', UserSchema);
