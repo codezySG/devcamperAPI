@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { genSalt, hash } from 'bcryptjs';
+import { genSalt, hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 
 const UserSchema = new Schema({
@@ -52,5 +52,10 @@ UserSchema.methods.getSignedJwtToken = function () {
 		expiresIn: JWT_EXPIRE
 	});
 };
+
+// Match user entered password to hashed password in db
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+	return await compare(enteredPassword, this.password);
+}
 
 export default model('User', UserSchema);
