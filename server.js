@@ -1,7 +1,7 @@
 import { join } from 'path';
 import express, { json } from 'express';
 import dotenv from 'dotenv';
-import { bootcamps, courses } from './routes/';
+import { bootcamps, courses, auth } from './routes/';
 import { logger, errorHandler } from './middleware/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
@@ -31,6 +31,7 @@ app.use(express.static(join(__dirname, 'public')));
 // routers
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
+app.use('/api/v1/auth', auth);
 
 app.use(errorHandler);
 
