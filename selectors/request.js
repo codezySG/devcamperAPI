@@ -21,3 +21,15 @@ export const getFiles = (request = {}) => {
 export const getFile = (request = {}) => {
 	return getFiles(request).file;
 }
+
+export const getHeaders = (request = {}) => {
+	return request.headers || {};
+}
+
+export const getCookies = (request = {}) => {
+	return request.cookies || {};
+}
+
+export const getUser = (request = {}) => {
+	return request.user || {};
+}

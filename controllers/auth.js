@@ -2,7 +2,7 @@
 import User from '../models/User';
 
 // Selectors
-import { getId, getBody, getParams, getFile } from '../selectors/request';
+import { getId, getBody, getParams, getFile, getUser } from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
@@ -56,6 +56,33 @@ export const login = asyncHandler(async (req, res, next) => {
 
 
 	// Create token
-	const token = user.getSignedJwtToken();
-	res.status(200).json({ success: true, token });
+	const token = sendTokenResponse(user, 200, res);
 });
+
+// v1/auth/me -- Public -- GET
+export const getMe  = asyncHandler(async (req, res, next) => {
+	const { id: protectedUserId } = getUser(req);
+	const user = await User.findById(protectedUserId);
+
+	res.status(200).json({ success: true, data: user });
+});
+
+// Get token from model, create cookie & send res
+const sendTokenResponse = (user = {}, statusCode, res = {}) => {
+	// create token
+	const token = user.getSignedJwtToken();
+
+	const { JWT_COOKIE_EXPIRE, NODE_ENV } = process.env || {};
+
+	let options = {
+		expires: new Date(Date.now() + JWT_COOKIE_EXPIRE * 24 * 60 * 1000),
+		httpOnly: true
+	};
+
+	// HTTPS cookie enabled only
+	if (NODE_ENV === 'production') {
+		options.secure = true;
+	}
+
+	res.status(statusCode).cookie('token', token, options).json({ success: true, token });
+};

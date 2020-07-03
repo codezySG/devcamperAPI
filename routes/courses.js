@@ -15,10 +15,10 @@ import {
 import Course from '../models/Course';
 
 // Middleware
-import { advancedResults } from '../middleware/';
+import { advancedResults, protect } from '../middleware/';
 
 // add middleware functions for appropriate routes
-router.route('/').get(advancedResults(Course, {path: 'bootcamp', select: 'name description'}), getCourses).post(addCourse); // the post req gets routed from bootcamps route
-router.route('/:id').get(getCourse).put(updateCourse).delete(deleteCourse);
+router.route('/').get(advancedResults(Course, {path: 'bootcamp', select: 'name description'}), getCourses).post(protect, addCourse); // the post req gets routed from bootcamps route
+router.route('/:id').get(getCourse).put(protect, updateCourse).delete(protect, deleteCourse);
 
 export default router;

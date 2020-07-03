@@ -7,6 +7,8 @@ import { connectDB } from './configs/db';
 import colors from 'colors';
 import fileUpload from 'express-fileupload';
 
+import cookieParser from 'cookie-parser';
+
 dotenv.config({path: './configs/config.env'});
 
 // Connect to DB
@@ -16,6 +18,8 @@ const app = express();
 
 // Body parser
 app.use(json());
+
+app.use(cookieParser());
 
 const { PORT=5000, NODE_ENV } = process.env || {};
 
