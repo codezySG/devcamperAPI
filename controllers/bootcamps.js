@@ -57,14 +57,25 @@ export const createBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 export const updateBootcamp = asyncHandler(async (req, res, next) => {
-	const bootcamp = await Bootcamp.findByIdAndUpdate(getId(req), getBody(req), {
-		new: true,
-		runValidators: true
-	});
+	const bootcampRequestId = getId(req);
+	let bootcamp = await Bootcamp.findById(bootcampRequestId);
 
 	if (!bootcamp) {
 		return next(new ErrorResponse(`Bootcamp not found with id of ${getId(req)}`, 404));
 	}
+
+	const { user: bootcampsUserId } = bootcamp;
+	const { id: userId, role: userRole } = getUser(req);
+
+	// Make sure user is the rightful owner of the bootcamp that is being updated (or theyre an admin)
+	if (bootcampsUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to update this bootcamp`, 401));
+	}
+
+	bootcamp = await Bootcamp.findByIdAndUpdate(bootcampRequestId, getBody(req), {
+		new: true,
+		runValidators: true
+	});
 
 	res.status(200).json({success: true, data: bootcamp});
 });
@@ -80,6 +91,14 @@ export const deleteBootcamp = asyncHandler(async (req, res, next) => {
 
 	if (!bootcamp) {
 		return next(new ErrorResponse(`Bootcamp not found with id of ${getId(req)}`, 404));
+	}
+
+	const { user: bootcampsUserId } = bootcamp;
+	const { id: userId, role: userRole } = getUser(req);
+
+	// Make sure user is the rightful owner of the bootcamp that is being deleted (or theyre an admin)
+	if (bootcampsUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to delete this bootcamp`, 401));
 	}
 
 	// triggers pre middleware to ensure proper recursive deletion
@@ -120,6 +139,14 @@ export const uploadBootcampPhoto = asyncHandler(async (req, res, next) => {
 
 	if (!bootcamp) {
 		return next(new ErrorResponse(`Bootcamp not found with id of ${getId(req)}`, 404));
+	}
+
+	const { user: bootcampsUserId } = bootcamp;
+	const { id: userId, role: userRole } = getUser(req);
+
+	// Make sure user is the rightful owner of the bootcamp that is being updated (or theyre an admin)
+	if (bootcampsUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to update this bootcamp`, 401));
 	}
 
 	const file = getFile(req);
