@@ -17,6 +17,7 @@ export const protect = asyncHandler(async (req, res, next) => {
 		token = authorization.split(' ')[1];
 	}
 	// else if (cookiesToken) {
+	// 	console.log('in here');
 	// 	token = cookiesToken;
 	// }
 

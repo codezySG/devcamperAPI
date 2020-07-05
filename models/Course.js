@@ -35,6 +35,11 @@ const CourseSchema = new Schema({
 		type: Schema.ObjectId,
 		ref: 'Bootcamp', // model name that is then exported
 		required: true
+	},
+	user: {
+		type: Schema.ObjectId,
+		ref: 'User', // model name that is then exported
+		required: true
 	}
 });
 

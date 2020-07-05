@@ -3,7 +3,7 @@ import Course from '../models/Course';
 import Bootcamp from '../models/Bootcamp';
 
 // Selectors
-import { getId, getBody, getParams, getQuery } from '../selectors/request';
+import { getId, getBody, getParams, getQuery, getUser } from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
@@ -54,12 +54,22 @@ export const getCourse = asyncHandler(async (req, res, next) => {
 export const addCourse = asyncHandler(async (req, res, next) => {
 	const params = getParams(req);
 	const { bootcampId } = params;
+	const { id: userId, role: userRole } = getUser(req);
+
 	req.body.bootcamp = bootcampId;
+	req.body.user = userId;
 
 	const bootcamp = await Bootcamp.findById(bootcampId);
 
 	if (!bootcamp) {
 		return next(new ErrorResponse(`No bootcamp with the id of ${bootcampId}`), 404);
+	}
+
+	const { user: bootcampsUserId } = bootcamp;
+
+	// Make sure user is the rightful owner of the bootcamp that the course is being added to (or theyre an admin)
+	if (bootcampsUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to add a course to bootcamp ${bootcampId}`, 401));
 	}
 
 	const course = await Course.create(req.body);
@@ -78,6 +88,14 @@ export const updateCourse = asyncHandler(async (req, res, next) => {
 
 	if (!course) {
 		return next(new ErrorResponse(`No course found with the id of ${id}`), 404);
+	}
+
+	const { user: courseUserId } = course;
+	const { id: userId, role: userRole } = getUser(req);
+
+	// Make sure user is the rightful owner of the bootcamp that the course is being added to (or theyre an admin)
+	if (courseUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to update a course to bootcamp ${id}`, 401));
 	}
 
 	course = await Course.findByIdAndUpdate(id, body, {
@@ -99,6 +117,14 @@ export const deleteCourse = asyncHandler(async (req, res, next) => {
 
 	if (!course) {
 		return next(new ErrorResponse(`No course found with the id of ${id}`), 404);
+	}
+
+	const { user: courseUserId } = course;
+	const { id: userId, role: userRole } = getUser(req);
+
+	// Make sure user is the rightful owner of the bootcamp that the course is being added to (or theyre an admin)
+	if (courseUserId.toString() !== userId && userRole !== 'admin') {
+		return next(new ErrorResponse(`User ${userId} is not authorized to delete a course to bootcamp ${id}`, 401));
 	}
 
 	await course.remove();
