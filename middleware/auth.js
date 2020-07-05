@@ -4,7 +4,7 @@ import ErrorResponse from '../utils/ErrorResponse';
 import User from '../models/User';
 
 // Selectors
-import { getHeaders, getCookies } from '../selectors/request';
+import { getHeaders, getCookies, getUser } from '../selectors/request';
 
 // Middleware to enable protection of certain routes (requires Bearer token/cookie)
 export const protect = asyncHandler(async (req, res, next) => {
@@ -38,3 +38,15 @@ export const protect = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Unauthorized access for this route', 401));
 	}
 });
+
+// Grant access to specific roles
+export const authorize = (...roles) => {
+	return (req, res, next) => {
+		const { role } = getUser(req);
+		if (!roles.includes(role)) {
+			return next(new ErrorResponse(`User role ${role} is unathorized to access this route`, 403)); // 403 forbidden
+		}
+
+		next && next();
+	}
+};

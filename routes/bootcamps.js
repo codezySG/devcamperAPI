@@ -15,7 +15,7 @@ import {
 import coursesRouter from './courses';
 
 // Middleware
-import { advancedResults, protect } from '../middleware/'
+import { advancedResults, protect, authorize } from '../middleware/'
 
 // Models
 import Bootcamp from '../models/Bootcamp';
@@ -25,8 +25,8 @@ router.use('/:bootcampId/courses', coursesRouter);
 
 // add middleware functions for appropriate routes
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
-router.route('/').get(advancedResults(Bootcamp, 'courses'), getBootcamps).post(protect, createBootcamp);
-router.route('/:id').get(getBootcamp).put(protect, updateBootcamp).delete(protect, deleteBootcamp);
-router.route('/:id/photo').put(protect, uploadBootcampPhoto);
+router.route('/').get(advancedResults(Bootcamp, 'courses'), getBootcamps).post(protect, authorize('publisher', 'admin'), createBootcamp);
+router.route('/:id').get(getBootcamp).put(protect, authorize('publisher', 'admin'), updateBootcamp).delete(protect, authorize('publisher', 'admin'), deleteBootcamp);
+router.route('/:id/photo').put(protect, authorize('publisher', 'admin'), uploadBootcampPhoto);
 
 export default router;
