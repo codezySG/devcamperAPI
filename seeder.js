@@ -4,6 +4,7 @@ import colors from 'colors';
 import dotenv from 'dotenv';
 import Bootcamp from './models/Bootcamp.js';
 import Course from './models/Course.js';
+import User from './models/User.js';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -23,11 +24,16 @@ const bootcamps = JSON.parse(
 const courses = JSON.parse(
 	fs.readFileSync(`${__dirname}/devcamper_project_resources/_data/courses.json`, 'utf-8')
 );
-// conosle.log(courses);
+
+const users = JSON.parse(
+	fs.readFileSync(`${__dirname}/devcamper_project_resources/_data/users.json`, 'utf-8')
+);
+
 const importData = async () => {
 	try {
 		await Bootcamp.create(bootcamps);
 		await Course.create(courses);
+		await User.create(users);
 		console.log('Data Imported...'.green.inverse);
 		process.exit();
 	} catch (err) {
@@ -39,6 +45,7 @@ const deleteData = async () => {
 	try {
 		await Bootcamp.deleteMany();
 		await Course.deleteMany();
+		await User.deleteMany();
 		console.log('Data Deleted...'.red.inverse);
 		process.exit();
 	} catch (err) {

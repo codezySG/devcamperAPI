@@ -4,7 +4,14 @@ import { parse } from 'path';
 import Bootcamp from '../models/Bootcamp';
 
 // Selectors
-import { getId, getBody, getParams, getFile } from '../selectors/request';
+import {
+	getId,
+	getBody,
+	getParams,
+	getFile,
+	getUser,
+	getRole
+} from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
@@ -31,6 +38,20 @@ export const getBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 export const createBootcamp = asyncHandler(async (req, res, next) => {
+	const { id: userId } = getUser(req);
+
+	// Add user to req.body
+	req.body.user = req.user.id;
+
+	// Check for existing published bootcamp
+	const publishedBootcamp = await Bootcamp.findOne({ user: userId });
+
+	// If the user is not an admin they can only add one bootcamp
+	if (publishedBootcamp && getRole(req) !== 'admin') {
+		return next(new ErrorResponse(`User with ${userId} has already published a bootcamp`, 400));
+	}
+
+	// Publisher/admin can only create one bootcamp
 	const bootcamp = await Bootcamp.create(req.body);
 	res.status(201).json({success: true, data: bootcamp});
 });

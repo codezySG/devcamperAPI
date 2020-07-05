@@ -33,3 +33,7 @@ export const getCookies = (request = {}) => {
 export const getUser = (request = {}) => {
 	return request.user || {};
 }
+
+export const getRole = (request = {}) => {
+	return request.role || {};
+}

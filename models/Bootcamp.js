@@ -97,6 +97,11 @@ const BootcampSchema = new Schema({
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    user: {
+      type: Schema.ObjectId,
+      ref: 'User', // model name that is then exported
+      required: true
     }
 }, {
   toJSON: { virtuals: true }, // this will enable us to have an array of courses appear in our bootcamp queries (reverse query)
