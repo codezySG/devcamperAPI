@@ -12,6 +12,9 @@ import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import xss from 'xss-clean';
+import hpp from 'hpp';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -20,8 +23,12 @@ connectDB();
 
 const app = express();
 
+const { PORT=5000, NODE_ENV, RATE_LIMIT_IN_MINS, RATE_LIMIT_MAX_REQUEST_AMOUNT } = process.env || {};
+
 // Body parser
 app.use(json());
+
+// ------------------- API SECURITY  -------------------
 // Sanitize data
 app.use(mongoSanitize());
 
@@ -31,9 +38,21 @@ app.use(helmet());
 // Prevent cross site scripting
 app.use(xss());
 
+// Overarching rate limit for API
+app.use(rateLimit({
+	windowMs: RATE_LIMIT_IN_MINS * 60 * 1000,
+	max: RATE_LIMIT_MAX_REQUEST_AMOUNT
+}));
+
+app.use(hpp());
+
+// Permit other domains to access the API
+// THIS API IS INTENDED TO BE PUBLIC. IF PRIVATE DO NOT ENABLE CORS
+app.use(cors());
+
 app.use(cookieParser());
 
-const { PORT=5000, NODE_ENV } = process.env || {};
+// ------------------- API SECURITY  -------------------
 
 if (NODE_ENV === 'development') {
 	app.use(logger);
