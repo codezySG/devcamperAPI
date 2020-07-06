@@ -8,8 +8,8 @@ export const errorHandler = (err, req, res, next) => {
 	const { name, value, code, kind } = error;
 
 	// mongoose bad obj id
-	if (name === 'CastError' || kind === 'ObjectId') {
-		const message = `Resource not found with id of ${value}`;
+	if (name === 'CastError' || kind === 'ObjectId' || kind === 'string') {
+		const message = `Resource not found`;
 		error = new ErrorResponse(message, 404);
 	} else if (code === 11000) { // mongoose duplicate key
 		const message = 'Duplicate field value entered';

@@ -2,12 +2,14 @@ import { join } from 'path';
 import express, { json } from 'express';
 import dotenv from 'dotenv';
 import { bootcamps, courses, auth, users, reviews } from './routes/';
-import { logger, errorHandler } from './middleware/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
 import fileUpload from 'express-fileupload';
 
+// middleware
+import { logger, errorHandler } from './middleware/';
 import cookieParser from 'cookie-parser';
+import mongoSanitize from 'express-mongo-sanitize';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -18,7 +20,7 @@ const app = express();
 
 // Body parser
 app.use(json());
-
+app.use(mongoSanitize());
 app.use(cookieParser());
 
 const { PORT=5000, NODE_ENV } = process.env || {};
