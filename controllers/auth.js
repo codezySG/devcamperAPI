@@ -2,11 +2,22 @@
 import User from '../models/User';
 
 // Selectors
-import { getId, getBody, getParams, getFile, getUser } from '../selectors/request';
+import {
+	getId,
+	getBody,
+	getParams,
+	getFile,
+	getUser,
+	getProtocol,
+	getHost
+} from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
 import { asyncHandler } from '../middleware/';
+
+// Utils
+import sendEmail from '../utils/sendEmail';
 
 // Utils
 import ErrorResponse from '../utils/ErrorResponse';
@@ -81,6 +92,30 @@ export const forgotPassword  = asyncHandler(async (req, res, next) => {
 
 	await user.save({ validateBeforeSave: false });
 
+	// Create reset url
+	const resetUrl = `${getProtocol(req)}://${getHost(req)}/api/v1/resetpassword/${resetToken}`;
+	const message = `You are receiving this email because you (or someone else) has requested a reset of your password. Please make a PUT request to: \n\n ${resetUrl}`;
+	
+	const { email } = user;
+	try {
+		await sendEmail({
+			email,
+			subject: 'Password reset token',
+			message
+		});
+
+		res.status(200).json({ success: true, data: 'Email sent' });
+	} catch(err) {
+		// clear fields from db that were added if something went wrong here
+		console.log(err);
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+
+		await user.save({ validateBeforeSave: false });
+
+		// 500 server error
+		return next && next(new ErrorResponse(`Email could not be sent`, 500));
+	}
 	res.status(200).json({ success: true, data: user });
 });
 

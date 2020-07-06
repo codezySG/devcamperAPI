@@ -37,3 +37,11 @@ export const getUser = (request = {}) => {
 export const getRole = (request = {}) => {
 	return request.role || {};
 }
+
+export const getProtocol = (request = {}) => {
+	return request.protocol;
+}
+
+export const getHost = (request = {}) => {
+	return request.get('host');
+}
