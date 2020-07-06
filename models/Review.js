@@ -33,5 +33,7 @@ const ReviewSchema = new Schema({
 	}
 });
 
+// Prevent user from submitting more than one review per one bootcamp
+ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true })
 
 export default model('Review', ReviewSchema);

@@ -45,7 +45,7 @@ export const authorize = (...roles) => {
 	return (req, res, next) => {
 		const { role } = getUser(req);
 		if (!roles.includes(role)) {
-			return next(new ErrorResponse(`User role ${role} is unathorized to access this route`, 403)); // 403 forbidden
+			return next(new ErrorResponse(`User role ${role} is unauthorized to access this route`, 403)); // 403 forbidden
 		}
 
 		next && next();

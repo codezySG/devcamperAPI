@@ -3,7 +3,8 @@ const router = Router({ mergeParams: true });
 
 import {
 	getReviews,
-	getReview
+	getReview,
+	addReview
 } from '../controllers/reviews';
 
 // Middleware
@@ -17,7 +18,8 @@ router.route('/')
 	.get(advancedResults(Review, {
 		path: 'bootcamp',
 		select: 'name description'
-	}), getReviews);
+	}), getReviews)
+	.post(protect, authorize('user', 'admin'), addReview);
 
 router.route('/:id').get(getReview);
 
