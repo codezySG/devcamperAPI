@@ -77,6 +77,37 @@ export const getMe  = asyncHandler(async (req, res, next) => {
 	res.status(200).json({ success: true, data: user });
 });
 
+// v1/auth/updatedetails -- Public -- Put
+export const updateDetails  = asyncHandler(async (req, res, next) => {
+	const { name, email } = getBody(req);
+	const fieldsToUpdate = { name, email };
+
+	const { id: protectedUserId } = getUser(req);
+	const user = await User.findByIdAndUpdate(protectedUserId, fieldsToUpdate, {
+		new: true,
+		runValidators: true
+	});
+
+	res.status(200).json({ success: true, data: user });
+});
+
+// v1/auth/updatepassword -- Public -- Put
+export const updatePassword  = asyncHandler(async (req, res, next) => {
+	const { id: protectedUserId } = getUser(req);
+	const user = await User.findById(protectedUserId).select('+password');
+
+	const { currentPassword, newPassword } = getBody(req);
+	// Check current password
+	if (!(await user.matchPassword(currentPassword))) {
+		return next(new ErrorResponse(`Password is incorrect`, 401));
+	}
+
+	user.password = newPassword;
+	await user.save();
+
+	return sendTokenResponse(user, 200, res);
+});
+
 // v1/auth/resetpassword/:resetToken -- Public -- PUT
 export const resetPassword  = asyncHandler(async (req, res, next) => {
 	// Get hashed token
