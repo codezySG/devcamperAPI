@@ -10,6 +10,8 @@ import fileUpload from 'express-fileupload';
 import { logger, errorHandler } from './middleware/';
 import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
+import helmet from 'helmet';
+import xss from 'xss-clean';
 
 dotenv.config({path: './configs/config.env'});
 
@@ -20,7 +22,15 @@ const app = express();
 
 // Body parser
 app.use(json());
+// Sanitize data
 app.use(mongoSanitize());
+
+// Set security headers
+app.use(helmet());
+
+// Prevent cross site scripting
+app.use(xss());
+
 app.use(cookieParser());
 
 const { PORT=5000, NODE_ENV } = process.env || {};
