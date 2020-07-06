@@ -77,6 +77,16 @@ export const getMe  = asyncHandler(async (req, res, next) => {
 	res.status(200).json({ success: true, data: user });
 });
 
+// v1/auth/logout -- Private -- GET
+export const logout  = asyncHandler(async (req, res, next) => {
+	res.cookie('token', 'none', {
+		expire: new Date(Date.now() + 10 * 1000),
+		httpOnly: true
+	});
+
+	res.status(200).json({ success: true, data: null });
+});
+
 // v1/auth/updatedetails -- Public -- Put
 export const updateDetails  = asyncHandler(async (req, res, next) => {
 	const { name, email } = getBody(req);

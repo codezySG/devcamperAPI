@@ -13,10 +13,10 @@ export const protect = asyncHandler(async (req, res, next) => {
 	const { cookies = {} } = getCookies(req);
 
 	const { token: cookiesToken } = cookies;
-	if (authorization && authorization.startsWith('Bearer')) {
+	if (authorization && authorization.startsWith('Bearer')) { // set token from bearer token in header
 		token = authorization.split(' ')[1];
 	}
-	// else if (cookiesToken) {
+	// else if (cookiesToken) { // set token from cookie
 	// 	console.log('in here');
 	// 	token = cookiesToken;
 	// }

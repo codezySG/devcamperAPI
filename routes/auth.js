@@ -8,7 +8,8 @@ import {
 	forgotPassword,
 	resetPassword,
 	updateDetails,
-	updatePassword
+	updatePassword,
+	logout
 } from '../controllers/auth';
 
 // Middleware
@@ -18,6 +19,7 @@ import { protect } from '../middleware/'
 router.route('/register').post(registerUser); // the post req gets routed from bootcamps route
 router.route('/login').post(login);
 router.route('/me').get(protect, getMe);
+router.route('/logout').get(logout);
 router.route('/forgotpassword').post(forgotPassword);
 router.route('/resetpassword/:resettoken').put(resetPassword);
 router.route('/updatedetails').put(protect, updateDetails);
