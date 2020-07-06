@@ -18,9 +18,9 @@ import { asyncHandler } from '../middleware/';
 
 // Utils
 import sendEmail from '../utils/sendEmail';
-
-// Utils
 import ErrorResponse from '../utils/ErrorResponse';
+
+import { createHash } from 'crypto';
 
 // v1/auth/register -- Public -- POST
 export const registerUser = asyncHandler(async (req, res, next) => {
@@ -65,9 +65,8 @@ export const login = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Invalid credentials`, 401));
 	}
 
-
 	// Create token
-	const token = sendTokenResponse(user, 200, res);
+	sendTokenResponse(user, 200, res);
 });
 
 // v1/auth/me -- Public -- GET
@@ -76,6 +75,34 @@ export const getMe  = asyncHandler(async (req, res, next) => {
 	const user = await User.findById(protectedUserId);
 
 	res.status(200).json({ success: true, data: user });
+});
+
+// v1/auth/resetpassword/:resetToken -- Public -- PUT
+export const resetPassword  = asyncHandler(async (req, res, next) => {
+	// Get hashed token
+	const { resettoken } = getParams(req);
+
+	const resetPasswordToken = createHash('sha256').update(resettoken).digest('hex');
+
+	const user = await User.findOne({
+		resetPasswordToken,
+		resetPasswordExpire: { $gt: Date.now() }
+	});
+
+	if (!user) {
+		return next(new ErrorResponse(`Invalid token`, 400));
+	}
+
+	const { password } = getBody(req);
+	// Set the new password
+	user.password = password; // Middleware will encrypt our password
+	user.resetPasswordToken = undefined;
+	user.resetPasswordExpire = undefined;
+
+	await user.save();
+
+	// Create token
+	sendTokenResponse(user, 200, res);
 });
 
 // v1/auth/forgotpassword -- Public -- POST
@@ -93,7 +120,7 @@ export const forgotPassword  = asyncHandler(async (req, res, next) => {
 	await user.save({ validateBeforeSave: false });
 
 	// Create reset url
-	const resetUrl = `${getProtocol(req)}://${getHost(req)}/api/v1/resetpassword/${resetToken}`;
+	const resetUrl = `${getProtocol(req)}://${getHost(req)}/api/v1/auth/resetpassword/${resetToken}`;
 	const message = `You are receiving this email because you (or someone else) has requested a reset of your password. Please make a PUT request to: \n\n ${resetUrl}`;
 	
 	const { email } = user;

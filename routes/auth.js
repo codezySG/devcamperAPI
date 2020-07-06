@@ -5,7 +5,8 @@ import {
 	registerUser,
 	login,
 	getMe,
-	forgotPassword
+	forgotPassword,
+	resetPassword
 } from '../controllers/auth';
 
 // Middleware
@@ -16,5 +17,6 @@ router.route('/register').post(registerUser); // the post req gets routed from b
 router.route('/login').post(login);
 router.route('/me').get(protect, getMe);
 router.route('/forgotpassword').post(forgotPassword);
+router.route('/resetpassword/:resettoken').put(resetPassword);
 
 export default router;
