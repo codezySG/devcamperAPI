@@ -13,6 +13,7 @@ import {
 
 // include other resource routers
 import coursesRouter from './courses';
+import reviewsRouter from './reviews';
 
 // Middleware
 import { advancedResults, protect, authorize } from '../middleware/'
@@ -22,6 +23,7 @@ import Bootcamp from '../models/Bootcamp';
 
 // re-routes the query to the coursesRouter
 router.use('/:bootcampId/courses', coursesRouter);
+router.use('/:bootcampId/reviews', reviewsRouter);
 
 // add middleware functions for appropriate routes
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
