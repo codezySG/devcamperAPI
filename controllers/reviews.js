@@ -3,7 +3,7 @@ import Review from '../models/Review';
 import Bootcamp from '../models/Bootcamp';
 
 // Selectors
-import { getParams, getUser } from '../selectors/request';
+import { getParams, getUser, getBody } from '../selectors/request';
 
 // Middleware
 // functions that (have access to req, res cycle)
@@ -62,4 +62,53 @@ export const addReview = asyncHandler(async (req, res, next) => {
 	const review = await Review.create(req.body)
 
 	res.status(201).json({ success: true, data: review });
+});
+
+// v1/reviews/:id -- Private -- PUT
+export const updateReview = asyncHandler(async (req, res, next) => {
+	const { id: reviewId } = getParams(req);
+
+	let review = await Review.findById(reviewId);
+
+	if (!review) {
+		return next(new ErrorResponse(`No review found with id of ${reviewId}`, 404));
+	}
+
+	// check if review belongs to the user || admin (questionable?)
+	const { user: userId } = review;
+	const { id: currUserId, role } = getUser(req);
+
+	if (userId.toString() !== currUserId && role !== 'admin') {
+		return next(new ErrorResponse(`Not authorized to update review ${reviewId}`, 401));
+	}
+
+	review = await Review.findByIdAndUpdate(reviewId, getBody(req), {
+		new: true,
+		runValidators: true
+	});
+
+	res.status(200).json({ success: true, data: review });
+});
+
+// v1/reviews/:id -- Private -- Delete
+export const deleteReview = asyncHandler(async (req, res, next) => {
+	const { id: reviewId } = getParams(req);
+
+	const review = await Review.findById(reviewId);
+
+	if (!review) {
+		return next(new ErrorResponse(`No review found with id of ${reviewId}`, 404));
+	}
+
+	// check if review belongs to the user || admin (questionable?)
+	const { user: userId } = review;
+	const { id: currUserId, role } = getUser(req);
+
+	if (userId.toString() !== currUserId && role !== 'admin') {
+		return next(new ErrorResponse(`Not authorized to delete review ${reviewId}`, 401));
+	}
+
+	await review.remove();
+
+	res.status(200).json({ success: true, data: null });
 });

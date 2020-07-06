@@ -65,12 +65,12 @@ ReviewSchema.statics.getAverageRating = async function (bootcampId) {
 	}
 };
 
-// Call getAverageCost after save
+// Call getAverageRating after save
 ReviewSchema.post('save', function () {
 	this.constructor.getAverageRating(this.bootcamp);
 });
 
-// Call getAverageCost before remove (if course is removed need to recalc avg cost)
+// Call getAverageRating before remove
 ReviewSchema.pre('remove', function () {
 	this.constructor.getAverageRating(this.bootcamp);
 });
