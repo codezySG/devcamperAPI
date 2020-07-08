@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=production babel-node server",
+    "build": "babel --presets @babel/preset-env src -d dist",
     "dev": "nodemon --exec babel-node server",
     "insert": "node babel-node seeder"
   },
@@ -14,7 +15,7 @@
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.1",
     "@babel/node": "^7.10.1",
-    "@babel/preset-env": "^7.10.1",
+    "@babel/preset-env": "^7.10.4",
     "nodemon": "^2.0.4"
   },
   "dependencies": {
