@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import { join } from 'path';
 import express, { json } from 'express';
 import { bootcamps, courses, auth, users, reviews } from './routes/';
