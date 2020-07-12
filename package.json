@@ -4,9 +4,9 @@
   "description": "Learn how to create an API with use of mongoDB and ExpressJS",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production babel-node server",
+    "start": "NODE_ENV=production babel-node src/server",
     "build": "babel --presets @babel/preset-env src -d dist",
-    "dev": "nodemon --exec babel-node server",
+    "dev": "nodemon --exec babel-node -r dotenv/config src/server",
     "insert": "node babel-node seeder"
   },
   "author": "Stefana Gloginic",

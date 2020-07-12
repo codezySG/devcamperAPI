@@ -1,7 +1,6 @@
 import "regenerator-runtime/runtime";
 import { join } from 'path';
 import express, { json } from 'express';
-import dotenv from 'dotenv';
 import { bootcamps, courses, auth, users, reviews } from './routes/';
 import { connectDB } from './configs/db';
 import colors from 'colors';
@@ -16,8 +15,6 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-
-dotenv.config({path: './configs/config.env'});
 
 // Connect to DB
 connectDB();
